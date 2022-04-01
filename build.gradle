@@ -23,13 +23,15 @@ allprojects {
 	group "org.springframework.boot"
 
 	repositories {
+		mavenLocal()
 		mavenCentral()
 		if (!version.endsWith('RELEASE')) {
 			maven { url "https://repo.spring.io/milestone" }
 		}
-		if (version.endsWith('BUILD-SNAPSHOT')) {
-			maven { url "https://repo.spring.io/snapshot" }
-		}
+		// 注释掉, 走本地
+//		if (version.endsWith('BUILD-SNAPSHOT')) {
+//			maven { url "https://repo.spring.io/snapshot" }
+//		}
 	}
 
 	configurations.all {
