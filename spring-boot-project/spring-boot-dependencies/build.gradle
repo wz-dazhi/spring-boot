@@ -1674,7 +1674,7 @@ bom {
 		}
 	}
 	//library("Spring Framework", "5.2.15.RELEASE") {
-	library("Spring Framework", "5.2.201.BUILD-SNAPSHOT") {
+	library("Spring Framework", "${springVersion}") {
 		group("org.springframework") {
 			imports = [
 				"spring-framework-bom"
