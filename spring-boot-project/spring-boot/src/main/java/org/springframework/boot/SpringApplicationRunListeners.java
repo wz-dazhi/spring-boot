@@ -39,10 +39,12 @@ class SpringApplicationRunListeners {
 
 	SpringApplicationRunListeners(Log log, Collection<? extends SpringApplicationRunListener> listeners) {
 		this.log = log;
+		// 设置运行监听器的类, 默认情况下EventPublishingRunListener
 		this.listeners = new ArrayList<>(listeners);
 	}
 
 	void starting() {
+		// 运行中, 交由各个运行监听器对象去广播事件
 		for (SpringApplicationRunListener listener : this.listeners) {
 			listener.starting();
 		}

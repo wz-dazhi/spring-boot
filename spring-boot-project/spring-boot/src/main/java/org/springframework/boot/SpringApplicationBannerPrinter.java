@@ -58,6 +58,7 @@ class SpringApplicationBannerPrinter {
 	Banner print(Environment environment, Class<?> sourceClass, Log logger) {
 		Banner banner = getBanner(environment);
 		try {
+			// log输出banner
 			logger.info(createStringFromBanner(banner, environment, sourceClass));
 		}
 		catch (UnsupportedEncodingException ex) {
@@ -74,7 +75,9 @@ class SpringApplicationBannerPrinter {
 
 	private Banner getBanner(Environment environment) {
 		Banners banners = new Banners();
+		// 添加图片banner, 如果存在
 		banners.addIfNotNull(getImageBanner(environment));
+		// 添加TXT banner, 如果存在
 		banners.addIfNotNull(getTextBanner(environment));
 		if (banners.hasAtLeastOneBanner()) {
 			return banners;
@@ -82,10 +85,12 @@ class SpringApplicationBannerPrinter {
 		if (this.fallbackBanner != null) {
 			return this.fallbackBanner;
 		}
+		// 返回默认banner
 		return DEFAULT_BANNER;
 	}
 
 	private Banner getTextBanner(Environment environment) {
+		// 获取banner位置 spring.banner.location, 默认banner.txt
 		String location = environment.getProperty(BANNER_LOCATION_PROPERTY, DEFAULT_BANNER_LOCATION);
 		Resource resource = this.resourceLoader.getResource(location);
 		if (resource.exists()) {
@@ -95,11 +100,13 @@ class SpringApplicationBannerPrinter {
 	}
 
 	private Banner getImageBanner(Environment environment) {
+		// 获取图片banner路径 spring.banner.image.location
 		String location = environment.getProperty(BANNER_IMAGE_LOCATION_PROPERTY);
 		if (StringUtils.hasLength(location)) {
 			Resource resource = this.resourceLoader.getResource(location);
 			return resource.exists() ? new ImageBanner(resource) : null;
 		}
+		// 遍历图片banner后缀: gif, jpg, png
 		for (String ext : IMAGE_EXTENSION) {
 			Resource resource = this.resourceLoader.getResource("banner." + ext);
 			if (resource.exists()) {
@@ -111,9 +118,11 @@ class SpringApplicationBannerPrinter {
 
 	private String createStringFromBanner(Banner banner, Environment environment, Class<?> mainApplicationClass)
 			throws UnsupportedEncodingException {
+		// 将banner输出到字节流中
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		banner.printBanner(environment, mainApplicationClass, new PrintStream(baos));
 		String charset = environment.getProperty("spring.banner.charset", "UTF-8");
+		// 字节流转换成字符串返回
 		return baos.toString(charset);
 	}
 
