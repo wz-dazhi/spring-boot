@@ -2,6 +2,8 @@ package com.springboot.debug;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
  * @projectName: spring-boot-build
@@ -16,7 +18,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Test {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Test.class, args);
+		ConfigurableApplicationContext c = SpringApplication.run(Test.class, args);
+		ConfigurableEnvironment e = c.getEnvironment();
+		System.out.println(e.getProperty("spring.application.name"));
 	}
 
 }
