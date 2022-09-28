@@ -101,6 +101,7 @@ public class TomcatWebServer implements WebServer {
 		this.tomcat = tomcat;
 		this.autoStart = autoStart;
 		this.gracefulShutdown = (shutdown == Shutdown.GRACEFUL) ? new GracefulShutdown(tomcat) : null;
+		// 初始化Tomcat容器
 		initialize();
 	}
 
@@ -120,6 +121,7 @@ public class TomcatWebServer implements WebServer {
 				});
 
 				// Start the server to trigger initialization listeners
+				// 启动Tomcat
 				this.tomcat.start();
 
 				// We can re-throw failure exception directly in the main thread
@@ -328,7 +330,9 @@ public class TomcatWebServer implements WebServer {
 					if (this.gracefulShutdown != null) {
 						this.gracefulShutdown.abort();
 					}
+					// 停止Tomcat
 					stopTomcat();
+					// Tomcat 销毁
 					this.tomcat.destroy();
 				}
 				catch (LifecycleException ex) {
