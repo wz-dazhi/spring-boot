@@ -176,6 +176,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		if (this.disableMBeanRegistry) {
 			Registry.disableRegistry();
 		}
+		// 创建Tomcat对象, 设置相关属性
 		Tomcat tomcat = new Tomcat();
 		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
@@ -189,7 +190,9 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
+		// 准备Tomcat上下文
 		prepareContext(tomcat.getHost(), initializers);
+		// 创建TomcatWebServer 并初始化Tomcat
 		return getTomcatWebServer(tomcat);
 	}
 
@@ -202,6 +205,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	protected void prepareContext(Host host, ServletContextInitializer[] initializers) {
 		File documentRoot = getValidDocumentRoot();
+		// 创建Tomcat内嵌上下文
 		TomcatEmbeddedContext context = new TomcatEmbeddedContext();
 		if (documentRoot != null) {
 			context.setResources(new LoaderHidingResourceRoot(context));
@@ -237,6 +241,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		context.addLifecycleListener(new StaticResourceConfigurer(context));
 		ServletContextInitializer[] initializersToUse = mergeInitializers(initializers);
 		host.addChild(context);
+		// 配置上下文
 		configureContext(context, initializersToUse);
 		postProcessContext(context);
 	}
@@ -350,12 +355,14 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	 * @param initializers initializers to apply
 	 */
 	protected void configureContext(Context context, ServletContextInitializer[] initializers) {
+		// 创建Tomcat 启动器, 这个类会根据Tomcat Context start的时候调用onStartUp 来初始化Servlet
 		TomcatStarter starter = new TomcatStarter(initializers);
 		if (context instanceof TomcatEmbeddedContext) {
 			TomcatEmbeddedContext embeddedContext = (TomcatEmbeddedContext) context;
 			embeddedContext.setStarter(starter);
 			embeddedContext.setFailCtxIfServletStartFails(true);
 		}
+		// 上下文添加Servlet容器初始化器, Tomcat启动会调用TomcatStarter类的onStartUp
 		context.addServletContainerInitializer(starter, NO_CLASSES);
 		for (LifecycleListener lifecycleListener : this.contextLifecycleListeners) {
 			context.addLifecycleListener(lifecycleListener);
@@ -375,6 +382,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		}
 		configureSession(context);
 		new DisableReferenceClearingContextCustomizer().customize(context);
+		// 自定义Tomcat上下文
 		for (TomcatContextCustomizer customizer : this.tomcatContextCustomizers) {
 			customizer.customize(context);
 		}
