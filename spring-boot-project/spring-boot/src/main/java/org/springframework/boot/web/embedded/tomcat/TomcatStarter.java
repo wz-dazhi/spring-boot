@@ -49,6 +49,7 @@ class TomcatStarter implements ServletContainerInitializer {
 	@Override
 	public void onStartup(Set<Class<?>> classes, ServletContext servletContext) throws ServletException {
 		try {
+			// 动态注册DispatchServlet filter listener
 			for (ServletContextInitializer initializer : this.initializers) {
 				initializer.onStartup(servletContext);
 			}
