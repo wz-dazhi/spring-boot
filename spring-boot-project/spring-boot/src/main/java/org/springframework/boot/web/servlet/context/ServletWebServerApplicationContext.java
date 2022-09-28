@@ -140,9 +140,11 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	@Override
 	public final void refresh() throws BeansException, IllegalStateException {
 		try {
+			// 调用父类refresh方法
 			super.refresh();
 		}
 		catch (RuntimeException ex) {
+			// 出现异常, 关闭webServer
 			WebServer webServer = this.webServer;
 			if (webServer != null) {
 				webServer.stop();
@@ -155,6 +157,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	protected void onRefresh() {
 		super.onRefresh();
 		try {
+			// 创建web server
 			createWebServer();
 		}
 		catch (Throwable ex) {
@@ -174,7 +177,9 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		WebServer webServer = this.webServer;
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
+			// 从容器中获取web 工厂
 			ServletWebServerFactory factory = getWebServerFactory();
+			// 工厂创建 webServer
 			this.webServer = factory.getWebServer(getSelfInitializer());
 			getBeanFactory().registerSingleton("webServerGracefulShutdown",
 					new WebServerGracefulShutdownLifecycle(this.webServer));
@@ -223,9 +228,11 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	}
 
 	private void selfInitialize(ServletContext servletContext) throws ServletException {
+		// 准备Root 容器
 		prepareWebApplicationContext(servletContext);
 		registerApplicationScope(servletContext);
 		WebApplicationContextUtils.registerEnvironmentBeans(getBeanFactory(), servletContext);
+		// 从容器中获取ServletRegistrationBean, ServletListenerRegistrationBean, FilterRegistrationBean, 动态注册Servlet Filter Listener
 		for (ServletContextInitializer beans : getServletContextInitializerBeans()) {
 			beans.onStartup(servletContext);
 		}
